@@ -1,15 +1,15 @@
 import 'package:cs492_weather_app/models/weather_forecast.dart';
-import '../../models/user_location.dart';
+import '../models/user_location.dart';
 import 'package:flutter/material.dart';
-import '../location/location.dart';
+import 'location.dart';
 
-class WeatherScreen extends StatefulWidget {
+class WeatherScreenWidget extends StatefulWidget {
   final Function getLocation;
   final Function getForecasts;
   final Function getForecastsHourly;
   final Function setLocation;
 
-  const WeatherScreen(
+  const WeatherScreenWidget(
       {super.key,
       required this.getLocation,
       required this.getForecasts,
@@ -17,10 +17,10 @@ class WeatherScreen extends StatefulWidget {
       required this.setLocation});
 
   @override
-  State<WeatherScreen> createState() => _WeatherScreenState();
+  State<WeatherScreenWidget> createState() => _WeatherScreenState();
 }
 
-class _WeatherScreenState extends State<WeatherScreen> {
+class _WeatherScreenState extends State<WeatherScreenWidget> {
   @override
   Widget build(BuildContext context) {
     return (widget.getLocation() != null && widget.getForecasts().isNotEmpty
@@ -123,7 +123,7 @@ class LocationWidget extends StatelessWidget {
     required this.widget,
   });
 
-  final WeatherScreen widget;
+  final WeatherScreenWidget widget;
 
   @override
   Widget build(BuildContext context) {

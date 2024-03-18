@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'components/location/location.dart';
+import 'components/location.dart';
 import 'package:flutter/material.dart';
 import 'models/user_location.dart';
-import 'components/weatherScreen/weather_screen.dart';
+import 'components/weather_screen_widget.dart';
 import 'models/weather_forecast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -154,7 +154,7 @@ class _MyHomePageState extends State<MyHomePage> {
           )
         ],
       ),
-      body: WeatherScreen(
+      body: WeatherScreenWidget(
           getLocation: getLocation,
           getForecasts: getForecasts,
           getForecastsHourly: getForecastsHourly,

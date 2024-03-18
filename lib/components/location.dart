@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../models/user_location.dart';
-import '../../models/location_database.dart';
+import '../models/user_location.dart';
+import '../models/location_database.dart';
 
 class Location extends StatefulWidget {
   // The setter and getter for the active location
