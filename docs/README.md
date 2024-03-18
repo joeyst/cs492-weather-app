@@ -1,0 +1,1 @@
+NOTE: All files (except `README.md`) in the `docs` directory are AI-generated. I do not take credit for the writing in these docs. They're intended to provide easier reference to functions and the overall structure of the weather app. 
