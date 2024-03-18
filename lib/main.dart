@@ -6,10 +6,12 @@ import 'models/user_location.dart';
 import 'components/weatherScreen/weather_screen.dart';
 import 'models/weather_forecast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 const sqlCreateDatabase = 'assets/sql/create.sql';
 
 void main() {
+  databaseFactory = databaseFactoryFfi;
   runApp(MyApp());
 }
 
