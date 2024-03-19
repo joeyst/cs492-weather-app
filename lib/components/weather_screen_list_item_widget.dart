@@ -1,7 +1,8 @@
 
 import 'package:flutter/material.dart';
 import '../models/weather_forecast.dart';
-
+import 'package:provider/provider.dart';
+import '../models/providers/current_location_provider.dart';
 
 class WeatherForecastListItemWidget extends StatelessWidget {
   final WeatherForecast weatherForecast;
@@ -21,17 +22,29 @@ class WeatherForecastListItemWidget extends StatelessWidget {
     
 
     // String imagePath = 'assets/images/${weatherForecast.icon}.png';
-    Widget weatherIcon = Image.asset(imagePath);
-    Row row = Row(
-      children: [
-        weatherIcon,
-        titleWidget,
-      ],
+    Widget weatherIcon = Image.asset(imagePath, width: 100, height: 100, fit: BoxFit.cover);
+    Widget titleWidgetBox = SizedBox(
+      width: 100,
+      height: 100,
+      child: titleWidget,
     );
+
+
+    List<Widget> children = [];
+    if (!Provider.of<CurrentLocationProvider>(context).isHourly()) {
+      children.add(titleWidgetBox);
+    }
+
+    children.add(weatherIcon);
+
+    Row row = Row(
+      children: children,
+    );
+
     return ListTile(
       title: row,
-      subtitle: Text("temperature: ${weatherForecast.temperature.toString()}"),
-      trailing: Text(weatherForecast.temperature.toString()),
+      subtitle: Text("F: ${weatherForecast.temperature.toString()}"),
+      // trailing: Text(weatherForecast.temperature.toString()),
     );
   }
 }

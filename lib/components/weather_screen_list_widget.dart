@@ -12,23 +12,15 @@ class WeatherScreenListWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final currentLocationProvider = Provider.of<CurrentLocationProvider>(context);
     List<WeatherForecast> forecasts = currentLocationProvider.getWeatherForecastList();
-    print("forecasts: ${forecasts.map((forecast) => "${forecast.toJsonString()}\n").toList()}");
+    bool isHourly = currentLocationProvider.isHourly();
+    Widget title = Text(isHourly ? "Hourly" : "Daily");
     List<WeatherForecastListItemWidget> forecastWidgets = forecasts.map((forecast) => WeatherForecastListItemWidget(forecast)).toList();
-    return ListView(
-      children: forecastWidgets,
+    return Column(children: [
+      title,
+      SizedBox(height: 1000, child: ListView(
+        children: forecastWidgets,
+      )),
+      ]
     );
-    // return Consumer<CurrentLocationProvider>(
-    //   builder: (context, currentLocationProvider, child) {
-    //     List<WeatherForecast> forecasts = currentLocationProvider.getWeatherForecastList();
-    //     UserLocation currentLocation = currentLocationProvider.getCurrentLocation();
-    //     return Text(currentLocation.toJsonString());
-
-        /*
-        // Needs current location + hourly bool. 
-        UserLocation userLocation = Provider.of<CurrentLocationProvider>(context, listen: false).getCurrentLocation();
-        return Text(userLocation.toJsonString());
-        */
-    //   },
-    // );
   }
 }
