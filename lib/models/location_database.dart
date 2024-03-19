@@ -40,7 +40,7 @@ class LocationDatabase {
     List<Map> locationEntries = await _db.rawQuery(query);
     List<UserLocation> locations = [];
     for (final entry in locationEntries) {
-      // locations.add(UserLocation.fromJson(Map<String, dynamic>.from(entry)));
+      locations.add(UserLocation.fromJson(Map<String, dynamic>.from(entry)));
     }
     return locations;
   }

@@ -70,17 +70,27 @@ class UserLocation {
         _ => throw const FormatException('Failed to load UserLocation.'),
       };
     } on Exception {
-      return UserLocation.defaultUserLocation();
+      return UserLocation.bend();
     }
   }
 
-  factory UserLocation.defaultUserLocation() {
+  factory UserLocation.bend() {
     return UserLocation(
       latitude: 44.0582,
       longitude: -121.3153, // Source: https://www.latlong.net/place/bend-or-usa-10063.html#:~:text=The%20latitude%20of%20Bend%2C%20OR,%C2%B0%2018'%2055.1088''%20W.
       city: "Bend",
       state: "Oregon",
       zip: "97702",
+    );
+  }
+
+  factory UserLocation.prineville() {
+    return UserLocation(
+      latitude: 44.300,
+      longitude: -120.8345,
+      city: "Prineville",
+      state: "Oregon",
+      zip: "97754",
     );
   }
 }
@@ -95,8 +105,8 @@ Future<UserLocation?> getLocationFromAddress(
   try {
     List<Location> locations = await locationFromAddress(addressString);
     return getLocationFromCoords(locations[0].latitude, locations[0].longitude);
-  } on NoResultFoundException {
-    return null;
+  } on Exception {
+    return Future.value(UserLocation.prineville());
   }
 }
 
