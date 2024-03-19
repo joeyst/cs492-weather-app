@@ -1,7 +1,7 @@
 import 'package:cs492_weather_app/models/weather_forecast.dart';
 import '../models/user_location.dart';
 import 'package:flutter/material.dart';
-import 'location.dart';
+import 'location_widget.dart';
 
 class WeatherScreenWidget extends StatefulWidget {
   final Function getLocation;
@@ -112,33 +112,6 @@ class LocationTextWidget extends StatelessWidget {
         width: 500,
         child: Text("${location.city}, ${location.state}, ${location.zip}",
             style: Theme.of(context).textTheme.headlineSmall),
-      ),
-    );
-  }
-}
-
-class LocationWidget extends StatelessWidget {
-  const LocationWidget({
-    super.key,
-    required this.widget,
-  });
-
-  final WeatherScreenWidget widget;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 400,
-      child: Column(
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text("Requires a location to begin"),
-          ),
-          Location(
-              setLocation: widget.setLocation,
-              getLocation: widget.getLocation),
-        ],
       ),
     );
   }

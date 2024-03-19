@@ -2,9 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'dart:math';
-class FlippedText extends StatelessWidget {
+class FlippedTextWidget extends StatelessWidget {
   final String text;
-  const FlippedText(this.text, {super.key});
+  const FlippedTextWidget(this.text, {super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -1,12 +1,14 @@
 import 'dart:convert';
 
-import 'components/location.dart';
+import 'components/location_widget.dart';
 import 'package:flutter/material.dart';
 import 'models/user_location.dart';
 import 'components/weather_screen_widget.dart';
 import 'models/weather_forecast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+
+import './components/flippable_text_widget.dart';
 
 const sqlCreateDatabase = 'assets/sql/create.sql';
 
@@ -144,7 +146,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text(widget.title),
+        title: FlippableTextWidget(widget.title),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         actions: [
           IconButton(

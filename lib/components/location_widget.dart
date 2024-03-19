@@ -1,6 +1,35 @@
 import 'package:flutter/material.dart';
 import '../models/user_location.dart';
 import '../models/location_database.dart';
+import './weather_screen_widget.dart';
+
+class LocationWidget extends StatelessWidget {
+  const LocationWidget({
+    super.key,
+    required this.widget,
+  });
+
+  final WeatherScreenWidget widget;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 400,
+      child: Column(
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text("Requires a location to begin"),
+          ),
+          Location(
+              setLocation: widget.setLocation,
+              getLocation: widget.getLocation),
+        ],
+      ),
+    );
+  }
+}
+
 
 class Location extends StatefulWidget {
   // The setter and getter for the active location
