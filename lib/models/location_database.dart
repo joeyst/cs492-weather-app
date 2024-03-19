@@ -23,6 +23,10 @@ class LocationDatabase {
       String query = await rootBundle.loadString(sqlCreateTablePath);
       await db.execute(query);
     });
+    // printing path 
+    print(db.path);
+    // 
+    print(db.path);
 
     return LocationDatabase(db: db);
   }
@@ -36,7 +40,7 @@ class LocationDatabase {
     List<Map> locationEntries = await _db.rawQuery(query);
     List<UserLocation> locations = [];
     for (final entry in locationEntries) {
-      locations.add(UserLocation.fromJson(Map<String, dynamic>.from(entry)));
+      // locations.add(UserLocation.fromJson(Map<String, dynamic>.from(entry)));
     }
     return locations;
   }

@@ -10,7 +10,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 const sqlCreateDatabase = 'assets/sql/create.sql';
 
-void main() {
+void main() async {
   databaseFactory = databaseFactoryFfi;
   runApp(MyApp());
 }

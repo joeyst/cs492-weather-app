@@ -52,22 +52,36 @@ class UserLocation {
   }
 
   factory UserLocation.fromJson(Map<String, dynamic> json) {
-    return switch (json) {
-      {
-        'latitude': double latitude,
-        'longitude': double longitude,
-        'city': String city,
-        'state': String state,
-        'zip': String zip
-      } =>
-        UserLocation(
-            latitude: latitude,
-            longitude: longitude,
-            city: city,
-            state: state,
-            zip: zip),
-      _ => throw const FormatException('Failed to load UserLocation.'),
-    };
+    try {
+      return switch (json) {
+        {
+          'latitude': double latitude,
+          'longitude': double longitude,
+          'city': String city,
+          'state': String state,
+          'zip': String zip
+        } =>
+          UserLocation(
+              latitude: latitude,
+              longitude: longitude,
+              city: city,
+              state: state,
+              zip: zip),
+        _ => throw const FormatException('Failed to load UserLocation.'),
+      };
+    } on Exception {
+      return UserLocation.defaultUserLocation();
+    }
+  }
+
+  factory UserLocation.defaultUserLocation() {
+    return UserLocation(
+      latitude: 44.0582,
+      longitude: -121.3153, // Source: https://www.latlong.net/place/bend-or-usa-10063.html#:~:text=The%20latitude%20of%20Bend%2C%20OR,%C2%B0%2018'%2055.1088''%20W.
+      city: "Bend",
+      state: "Oregon",
+      zip: "97702",
+    );
   }
 }
 
@@ -94,49 +108,50 @@ Future<UserLocation> getLocationFromGPS() async {
   return getLocationFromCoords(position.latitude, position.longitude);
 }
 
-Future<UserLocation> getLocationFromCoords(
-    double latitude, double longitude) async {
-  // async function that delivers a UserLocation using latitude and longitude
+Future<UserLocation> getLocationFromCoords(double latitude, double longitude) async {
+    String city = "";
+    String state = "";
+    String zip = "";
+    String country = "";
 
-  String city = "";
-  String state = "";
-  String zip = "";
-  String country = "";
+    List<Placemark> placemarks = [];
 
-  List<Placemark> placemarks =
-      await placemarkFromCoordinates(latitude, longitude);
-
-  // State: administrativeArea
-  // City: locality
-  // Zip: postalCode
-  // Country: country
-
-  // Loops through the locations attempting to find a city, state, and zip in the address information
-  for (int i = 0; i < placemarks.length; i++) {
-    if (city == "") {
-      city = placemarks[i].locality!;
+    try {
+      placemarks = await placemarkFromCoordinates(latitude, longitude);
+    } on Exception {
+      return UserLocation(
+          latitude: 44.0582,
+          longitude: -121.3153, // Source: https://www.latlong.net/place/bend-or-usa-10063.html#:~:text=The%20latitude%20of%20Bend%2C%20OR,%C2%B0%2018'%2055.1088''%20W. 
+          city: "Bend",
+          state: "Oregon",
+          zip: "97702");
     }
-    if (state == "") {
-      state = placemarks[i].administrativeArea!;
+    // Finding city, state, and zip in the address information
+    for (int i = 0; i < placemarks.length; i++) {
+      if (city == "") {
+        city = placemarks[i].locality!;
+      }
+      if (state == "") {
+        state = placemarks[i].administrativeArea!;
+      }
+      if (zip == "") {
+        zip = placemarks[i].postalCode!;
+      }
+      if (country == "") {
+        country = placemarks[i].country!;
+      }
     }
-    if (zip == "") {
-      zip = placemarks[i].postalCode!;
-    }
-    if (country == "") {
-      country = placemarks[i].country!;
-    }
-  }
 
-  if (country != allowedNation) {
-    Future.error("Error: Location must be in $allowedNation.");
-  }
+    if (country != allowedNation) {
+      Future.error("Error: Location must be in $allowedNation.");
+    }
 
-  return UserLocation(
-      latitude: latitude,
-      longitude: longitude,
-      city: city,
-      state: state,
-      zip: zip);
+    return UserLocation(
+        latitude: latitude,
+        longitude: longitude,
+        city: city,
+        state: state,
+        zip: zip);
 }
 
 // NOTE: THIS FUNCTION IS A HELPER FUNCTION DIRECTLY FROM THE GEOLOCATOR DOCUMENTATION.
@@ -151,34 +166,48 @@ Future<Position> _determinePosition() async {
   LocationPermission permission;
 
   // Test if location services are enabled.
-  serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  if (!serviceEnabled) {
-    // Location services are not enabled don't continue
-    // accessing the position and request users of the
-    // App to enable the location services.
-    return Future.error('Location services are disabled.');
-  }
-
-  permission = await Geolocator.checkPermission();
-  if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {
-      // Permissions are denied, next time you could try
-      // requesting permissions again (this is also where
-      // Android's shouldShowRequestPermissionRationale
-      // returned true. According to Android guidelines
-      // your App should show an explanatory UI now.
-      return Future.error('Location permissions are denied');
+  try {
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled don't continue
+      // accessing the position and request users of the
+      // App to enable the location services.
+      return Future.error('Location services are disabled.');
     }
-  }
 
-  if (permission == LocationPermission.deniedForever) {
-    // Permissions are denied forever, handle appropriately.
-    return Future.error(
-        'Location permissions are permanently denied, we cannot request permissions.');
-  }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permissions are denied, next time you could try
+        // requesting permissions again (this is also where
+        // Android's shouldShowRequestPermissionRationale
+        // returned true. According to Android guidelines
+        // your App should show an explanatory UI now.
+        return Future.error('Location permissions are denied');
+      }
+    }
 
-  // When we reach here, permissions are granted and we can
-  // continue accessing the position of the device.
-  return await Geolocator.getCurrentPosition();
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    // When we reach here, permissions are granted and we can
+    // continue accessing the position of the device.
+    return await Geolocator.getCurrentPosition();
+  } on Exception catch (e) {
+    return Future.value(Position(
+        latitude: 44.0582,
+        longitude: -121.3153, 
+        timestamp: DateTime.now(),
+        accuracy: 0.0,
+        altitude: 0.0,
+        altitudeAccuracy: 0.0,
+        heading: 0.0,
+        headingAccuracy: 0.0,
+        speed: 0.0,
+        speedAccuracy: 0.0));
+  }
 }
