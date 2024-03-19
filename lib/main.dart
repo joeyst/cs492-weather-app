@@ -10,10 +10,39 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import './components/flippable_text_widget.dart';
 
+import 'package:provider/provider.dart';
+
 const sqlCreateDatabase = 'assets/sql/create.sql';
+
+class UserLocationProvider extends ChangeNotifier {
+  UserLocation? _userLocation;
+
+  UserLocation? get userLocation => _userLocation;
+
+  void setUserLocation(UserLocation userLocation) {
+    _userLocation = userLocation;
+    notifyListeners();
+  }
+
+  void load() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    String locationString = sharedPreferences.getString("location") ?? "";
+    _userLocation = UserLocation.fromJsonString(locationString);
+  }
+}
+
+class LocationListProvider extends ChangeNotifier {
+  List<UserLocation> _locationList = [];
+
+  void update(UserLocation userLocation) {
+    _locationList.add(userLocation);
+    notifyListeners();
+  }
+}
 
 void main() async {
   databaseFactory = databaseFactoryFfi;
+  
   runApp(MyApp());
 }
 
@@ -24,7 +53,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<ThemeMode>(
+    return MultiProvider(
+      providers: [
+        Provider<UserLocationProvider>(create: (_) => UserLocationProvider()),
+        Provider<LocationListProvider>(create: (_) => LocationListProvider()),
+      ],
+      child:  ValueListenableBuilder<ThemeMode>(
         valueListenable: _notifier,
         builder: (_, mode, __) {
           return MaterialApp(
@@ -34,7 +68,9 @@ class MyApp extends StatelessWidget {
             themeMode: mode,
             home: MyHomePage(title: "CS492 Weather App", notifier: _notifier),
           );
-        });
+        }
+      )
+    );
   }
 }
 

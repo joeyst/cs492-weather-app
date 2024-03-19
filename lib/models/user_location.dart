@@ -51,6 +51,11 @@ class UserLocation {
     return jsonEncode(mappedObject);
   }
 
+  factory UserLocation.fromJsonString(String jsonString) {
+    Map<String, dynamic> json = jsonDecode(jsonString);
+    return UserLocation.fromJson(json);
+  }
+
   factory UserLocation.fromJson(Map<String, dynamic> json) {
     try {
       return switch (json) {
