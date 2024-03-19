@@ -14,14 +14,23 @@ class CurrentLocationProvider extends ChangeNotifier {
     _currentLocation = currentLocation;
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     sharedPreferences.setString("location", _currentLocation?.toJsonString() ?? "");
-    updateForecasts();
+    await updateForecasts();
     notifyListeners();
   }
 
   void setHourly(bool isHourly) async {
     _isHourly = isHourly;
-    updateForecasts();
+    await updateForecasts();
+    print("set hourly to $isHourly");
     notifyListeners();
+  }
+
+  void toggleHourly() async {
+    setHourly(!_isHourly);
+  }
+
+  bool isHourly() {
+    return _isHourly;
   }
 
   static Future<CurrentLocationProvider> create() async {
@@ -29,19 +38,25 @@ class CurrentLocationProvider extends ChangeNotifier {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String locationString = sharedPreferences.getString("location") ?? "";
     clp._currentLocation = UserLocation.fromJsonString(locationString);
-    clp.updateForecasts();
+    await clp.updateForecasts();
     return clp;
   }
 
   List<WeatherForecast> getWeatherForecastList() {
-    return [...(_forecasts ?? [])];
+    if (_forecasts == null) { 
+      print("forecast list null");
+
+    }
+    return _forecasts ?? [];
   }
 
   UserLocation getCurrentLocation() {
     return _currentLocation!;
   }
 
-  void updateForecasts() async {
+  Future<void> updateForecasts() async {
     _forecasts = await getWeatherForecasts(_currentLocation!, _isHourly);
+    notifyListeners();
+    // return Future.value(void);
   }
 }

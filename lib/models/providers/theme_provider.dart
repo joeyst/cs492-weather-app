@@ -30,6 +30,7 @@ class ThemeProvider extends ChangeNotifier {
   void setLight(bool value) async {
     _light = value;
     (await SharedPreferences.getInstance()).setBool("light", value);
+    print("Set light to $value");
     notifyListeners();
   }
 }

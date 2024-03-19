@@ -45,6 +45,20 @@ class WeatherForecast {
       _ => throw const FormatException('Failed to load Weather Forecast.'),
     };
   }
+
+  String toJsonString() {
+    Map<String, dynamic> mappedObject = {
+      "name": name,
+      "isDaytime": isDaytime,
+      "temperature": temperature,
+      "windSpeed": windSpeed,
+      "windDirection": windDirection,
+      "shortForecast": shortForecast,
+      "detailedForecast": detailedForecast,
+    };
+
+    return jsonEncode(mappedObject);
+  }
 }
 
 Future<List<WeatherForecast>> getHourlyForecasts(UserLocation location) async {

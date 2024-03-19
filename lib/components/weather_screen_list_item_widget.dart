@@ -9,9 +9,28 @@ class WeatherForecastListItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    
+    Widget titleWidget = Text("Name: ${weatherForecast.name}");
+    String iconName = "summer";
+    if (weatherForecast.temperature % 2 == 0) {
+      iconName = "winter";
+    }
+    // else if (weatherForcast.
+      
+    String imagePath = "assets/weather_icons/${iconName}_furby.jpg";
+    
+
+    // String imagePath = 'assets/images/${weatherForecast.icon}.png';
+    Widget weatherIcon = Image.asset(imagePath);
+    Row row = Row(
+      children: [
+        weatherIcon,
+        titleWidget,
+      ],
+    );
     return ListTile(
-      title: Text(weatherForecast.name),
-      subtitle: Text(weatherForecast.temperature.toString()),
+      title: row,
+      subtitle: Text("temperature: ${weatherForecast.temperature.toString()}"),
       trailing: Text(weatherForecast.temperature.toString()),
     );
   }
