@@ -12,8 +12,6 @@ import './components/flippable_text_widget.dart';
 
 import 'package:provider/provider.dart';
 
-import './models/location_database.dart';
-
 import './models/providers/current_location_provider.dart';
 import './models/providers/location_list_provider.dart';
 

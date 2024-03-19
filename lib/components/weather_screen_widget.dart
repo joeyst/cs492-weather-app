@@ -23,12 +23,14 @@ class WeatherScreenWidget extends StatefulWidget {
 class _WeatherScreenState extends State<WeatherScreenWidget> {
   @override
   Widget build(BuildContext context) {
-    return (widget.getLocation() != null && widget.getForecasts().isNotEmpty
-        ? ForecastWidget(
+    if (widget.getLocation() != null && widget.getForecasts().isNotEmpty) {
+      return ForecastWidget(
             context: context,
             location: widget.getLocation(),
-            forecasts: widget.getForecastsHourly())
-        : LocationWidget(widget: widget));
+            forecasts: widget.getForecastsHourly());
+    } else {
+      return LocationWidget(widget: widget);
+    }
   }
 }
 
