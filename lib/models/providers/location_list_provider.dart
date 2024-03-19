@@ -1,10 +1,13 @@
 import '../user_location.dart';
 import '../location_database.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class LocationListProvider extends ChangeNotifier {
   late List<UserLocation> _locationList;
   late LocationDatabase db;
+
+  LocationListProvider();
 
   void addLocation(UserLocation userLocation) {
     _locationList.add(userLocation);

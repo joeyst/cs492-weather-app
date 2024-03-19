@@ -14,29 +14,73 @@ import 'package:provider/provider.dart';
 
 import './models/providers/current_location_provider.dart';
 import './models/providers/location_list_provider.dart';
+import './components/weather_screen_list_widget.dart';
 
 const sqlCreateDatabase = 'assets/sql/create.sql';
+
+class ThemeProvider extends ChangeNotifier {
+  bool isLight = true;
+
+  void setLight(bool isLight) {
+    this.isLight = isLight;
+    notifyListeners();
+  }
+
+  ThemeMode themeMode() {
+    if (isLight) {
+      return ThemeMode.light;
+    } else {
+      return ThemeMode.dark;
+    }
+  }
+}
 
 void main() async {
   databaseFactory = databaseFactoryFfi;
   WidgetsFlutterBinding.ensureInitialized();
   LocationListProvider locationListProvider = await LocationListProvider.create();
   CurrentLocationProvider currentLocationProvider = await CurrentLocationProvider.create();
-  runApp(MyApp());
+  ThemeProvider themeProvider = ThemeProvider();
+  runApp(MyApp(locationListProvider, currentLocationProvider, themeProvider));
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({super.key});
-
-  final ValueNotifier<ThemeMode> _notifier = ValueNotifier(ThemeMode.light);
+  LocationListProvider locationListProvider;
+  CurrentLocationProvider currentLocationProvider;
+  ThemeProvider themeProvider;
+  MyApp(this.locationListProvider, this.currentLocationProvider, this.themeProvider, {super.key});
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        Provider<CurrentLocationProvider>(create: (_) => CurrentLocationProvider()),
-        Provider<LocationListProvider>(create: (_) => LocationListProvider()),
+        Provider<CurrentLocationProvider>(create: (_) => currentLocationProvider),
+        Provider<LocationListProvider>(create: (_) => locationListProvider),
+        Provider<ThemeProvider>(create: (_) => themeProvider),
       ],
+      child: Consumer<ThemeProvider>(
+      builder: (context, themeProvider, _) {
+        return MaterialApp(
+          title: 'CS 492 Weather App',
+          theme: ThemeData.light(),
+          darkTheme: ThemeData.dark(),
+          themeMode: themeProvider.themeMode(),
+          home: Consumer<CurrentLocationProvider>(
+            builder: (context, currentLocationProvider, _) {
+              return Consumer<LocationListProvider>(
+                builder: (context, locationListProvider, _) {
+                  return MyHomePage(
+                    title: "CS492 Weather App",
+                    currentLocationProvider: currentLocationProvider,
+                    locationListProvider: locationListProvider,
+                  );
+                },
+              );
+            },
+          ),
+        );
+      }
+      /*
       child:  ValueListenableBuilder<ThemeMode>(
         valueListenable: _notifier,
         builder: (_, mode, __) {
@@ -49,6 +93,7 @@ class MyApp extends StatelessWidget {
           );
         }
       )
+      */
     );
   }
 }
@@ -168,18 +213,28 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: const Icon(Icons.settings),
             tooltip: 'Open Settings',
             onPressed: _openEndDrawer,
-          )
+          ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Toggle hourly.',
+            onPressed: _toggleHourly,
+          ),
         ],
       ),
-      body: WeatherScreenWidget(
-          getLocation: getLocation,
-          getForecasts: getForecasts,
-          getForecastsHourly: getForecastsHourly,
-          setLocation: setLocation),
+      // body: WeatherScreenWidget(
+      //     getLocation: getLocation,
+      //     getForecasts: getForecasts,
+      //     getForecastsHourly: getForecastsHourly,
+      //     setLocation: setLocation),
+      body: WeatherScreenListWidget(),
       endDrawer: Drawer(
         child: settingsDrawer(),
       ),
     );
+  }
+
+  void _toggleHourly() {
+    Provider.of<CurrentLocationProvider>(context, listen: false).setHourly(false);
   }
 
   SizedBox modeToggle() {
