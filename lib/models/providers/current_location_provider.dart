@@ -20,6 +20,7 @@ class CurrentLocationProvider extends ChangeNotifier {
 
   void setHourly(bool isHourly) async {
     _isHourly = isHourly;
+    updateForecasts();
     notifyListeners();
   }
 

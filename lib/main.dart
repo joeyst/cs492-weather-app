@@ -14,33 +14,19 @@ import 'package:provider/provider.dart';
 
 import './models/providers/current_location_provider.dart';
 import './models/providers/location_list_provider.dart';
+import './models/providers/theme_provider.dart';
 import './components/weather_screen_list_widget.dart';
+import './components/flipped_text_widget.dart';
 
 const sqlCreateDatabase = 'assets/sql/create.sql';
 
-class ThemeProvider extends ChangeNotifier {
-  bool isLight = true;
-
-  void setLight(bool isLight) {
-    this.isLight = isLight;
-    notifyListeners();
-  }
-
-  ThemeMode themeMode() {
-    if (isLight) {
-      return ThemeMode.light;
-    } else {
-      return ThemeMode.dark;
-    }
-  }
-}
-
 void main() async {
   databaseFactory = databaseFactoryFfi;
+  Provider.debugCheckInvalidValueType = null;
   WidgetsFlutterBinding.ensureInitialized();
   LocationListProvider locationListProvider = await LocationListProvider.create();
   CurrentLocationProvider currentLocationProvider = await CurrentLocationProvider.create();
-  ThemeProvider themeProvider = ThemeProvider();
+  ThemeProvider themeProvider = await ThemeProvider.create();
   runApp(MyApp(locationListProvider, currentLocationProvider, themeProvider));
 }
 
@@ -71,37 +57,98 @@ class MyApp extends StatelessWidget {
                 builder: (context, locationListProvider, _) {
                   return MyHomePage(
                     title: "CS492 Weather App",
-                    currentLocationProvider: currentLocationProvider,
-                    locationListProvider: locationListProvider,
                   );
                 },
               );
             },
           ),
         );
+        
       }
-      /*
-      child:  ValueListenableBuilder<ThemeMode>(
-        valueListenable: _notifier,
-        builder: (_, mode, __) {
-          return MaterialApp(
-            title: 'CS 492 Weather App',
-            theme: ThemeData.light(),
-            darkTheme: ThemeData.dark(),
-            themeMode: mode,
-            home: MyHomePage(title: "CS492 Weather App", notifier: _notifier),
-          );
-        }
-      )
-      */
+    ));
+  }
+}
+
+class MyHomePage extends StatelessWidget {
+  final String title;
+  const MyHomePage({super.key, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: FlippedTextWidget(title),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Toggle hourly.',
+            onPressed: () {
+              Provider.of<CurrentLocationProvider>(context, listen: false).setHourly(false);
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            tooltip: 'Open Settings',
+            onPressed: () => _openEndDrawer(context),
+          ),
+        ],
+      ),
+      body: const WeatherScreenListWidget(),
+    );
+  }
+
+  void _openEndDrawer(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const SettingsDrawer()),
     );
   }
 }
 
+SafeArea settingsDrawer() {
+    return SafeArea(
+      child: Column(
+        children: [
+          SettingsHeaderText(context: context, text: "Settings:"),
+          modeToggle(),
+          SettingsHeaderText(context: context, text: "My Locations:"),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Location(
+                setLocation: setLocation,
+                getLocation: getLocation,
+                closeEndDrawer: _closeEndDrawer),
+          ),
+          ElevatedButton(
+              onPressed: _closeEndDrawer, child: const Text("Close Settings"))
+        ],
+      ),
+    );
+  }
+
+/*
+appBar: AppBar(
+  title: FlippableTextWidget(widget.title),
+  backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+  actions: [
+    IconButton(
+      icon: const Icon(Icons.settings),
+      tooltip: 'Open Settings',
+      onPressed: _openEndDrawer,
+    ),
+    IconButton(
+      icon: const Icon(Icons.refresh),
+      tooltip: 'Toggle hourly.',
+      onPressed: _toggleHourly,
+    ),
+  ],
+*/
+
+/*
 class MyHomePage extends StatefulWidget {
   final String title;
-  final ValueNotifier<ThemeMode> notifier;
-  const MyHomePage({super.key, required this.title, required this.notifier});
+  const MyHomePage({super.key, required this.title});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -166,7 +213,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    _light = widget.notifier.value == ThemeMode.light;
+    _light = true;
 
     _initMode();
   }
@@ -198,7 +245,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _setTheme(value) {
-    widget.notifier.value = value ? ThemeMode.light : ThemeMode.dark;
+    return Provider.of<ThemeProvider>(context, listen: false).setLight(value);
   }
 
   @override
@@ -296,3 +343,4 @@ class SettingsHeaderText extends StatelessWidget {
     );
   }
 }
+*/
