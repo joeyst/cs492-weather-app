@@ -15,8 +15,12 @@ class ThemeProvider extends ChangeNotifier {
     return tp;
   }
 
+  bool isLight() {
+    return _light!;
+  }
+
   ThemeMode themeMode() {
-    if (_light! == true) {
+    if (_light == true) {
       return ThemeMode.light;
     } else {
       return ThemeMode.dark;

@@ -31,10 +31,10 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  LocationListProvider locationListProvider;
-  CurrentLocationProvider currentLocationProvider;
-  ThemeProvider themeProvider;
-  MyApp(this.locationListProvider, this.currentLocationProvider, this.themeProvider, {super.key});
+  final LocationListProvider locationListProvider;
+  final CurrentLocationProvider currentLocationProvider;
+  final ThemeProvider themeProvider;
+  const MyApp(this.locationListProvider, this.currentLocationProvider, this.themeProvider, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -44,28 +44,15 @@ class MyApp extends StatelessWidget {
         Provider<LocationListProvider>(create: (_) => locationListProvider),
         Provider<ThemeProvider>(create: (_) => themeProvider),
       ],
-      child: Consumer<ThemeProvider>(
-      builder: (context, themeProvider, _) {
-        return MaterialApp(
+      child:
+        MaterialApp(
           title: 'CS 492 Weather App',
           theme: ThemeData.light(),
           darkTheme: ThemeData.dark(),
           themeMode: themeProvider.themeMode(),
-          home: Consumer<CurrentLocationProvider>(
-            builder: (context, currentLocationProvider, _) {
-              return Consumer<LocationListProvider>(
-                builder: (context, locationListProvider, _) {
-                  return MyHomePage(
-                    title: "CS492 Weather App",
-                  );
-                },
-              );
-            },
-          ),
-        );
-        
-      }
-    ));
+          home: MyHomePage(title: "CS492 Weather App"),
+        )
+    );
   }
 }
 
@@ -75,6 +62,7 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentLocationProvider = context.watch<CurrentLocationProvider>();
     return Scaffold(
       appBar: AppBar(
         title: FlippedTextWidget(title),
@@ -84,7 +72,7 @@ class MyHomePage extends StatelessWidget {
             icon: const Icon(Icons.refresh),
             tooltip: 'Toggle hourly.',
             onPressed: () {
-              Provider.of<CurrentLocationProvider>(context, listen: false).setHourly(false);
+              currentLocationProvider.setHourly(false);
             },
           ),
           IconButton(
@@ -106,26 +94,228 @@ class MyHomePage extends StatelessWidget {
   }
 }
 
-SafeArea settingsDrawer() {
-    return SafeArea(
-      child: Column(
-        children: [
-          SettingsHeaderText(context: context, text: "Settings:"),
-          modeToggle(),
-          SettingsHeaderText(context: context, text: "My Locations:"),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Location(
-                setLocation: setLocation,
-                getLocation: getLocation,
-                closeEndDrawer: _closeEndDrawer),
-          ),
-          ElevatedButton(
-              onPressed: _closeEndDrawer, child: const Text("Close Settings"))
-        ],
+class SettingsDrawer extends StatelessWidget {
+  const SettingsDrawer({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final currentLocationProvider = context.watch<CurrentLocationProvider>();
+    final themeProvider = context.watch<ThemeProvider>();
+    // final currentLocationProvider = Provider.of<CurrentLocationProvider>(context);
+    // final themeProvider = Provider.of<ThemeProvider>(context);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Settings'),
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            SettingsHeaderText(context: context, text: "Settings:"),
+            modeToggle(context),
+            SettingsHeaderText(context: context, text: "My Locations:"),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Location(
+                setLocation: currentLocationProvider.setCurrentLocation,
+                getLocation: currentLocationProvider.getCurrentLocation,
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Close Settings"),
+            ),
+          ],
+        ),
       ),
     );
   }
+}
+
+/*
+Widget modeToggle(BuildContext context, ThemeProvider themeProvider) {
+  return SizedBox(
+    width: 400,
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          themeProvider.isLight() ? "Light Mode" : "Dark Mode",
+          style: Theme.of(context).textTheme.labelLarge,
+        ),
+        Transform.scale(
+          scale: 0.5,
+          child: Switch(
+            value: themeProvider.isLight(),
+            onChanged: (value) => themeProvider.setLight(value),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+*/
+
+Widget modeToggle(BuildContext context) {
+  // final themeProvider = Provider.of<ThemeProvider>(context);
+  final themeProvider = context.watch<ThemeProvider>();
+  return
+      SizedBox(
+        width: 400,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              themeProvider.isLight() ? "Light Mode" : "Dark Mode",
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
+            Transform.scale(
+              scale: 0.5,
+              child: Switch(
+                value: themeProvider.isLight(),
+                onChanged: (value) => themeProvider.setLight(value),
+              ),
+            ),
+          ],
+        ),
+      );
+  }
+
+class SettingsHeaderText extends StatelessWidget {
+  final String text;
+  final BuildContext context;
+
+  const SettingsHeaderText({
+    super.key,
+    required this.context,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.headlineSmall,
+      ),
+    );
+  }
+}
+
+/*
+class SettingsDrawer extends StatelessWidget {
+  const SettingsDrawer({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final currentLocationProvider = Provider.of<CurrentLocationProvider>(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Settings'),
+      ),
+      body: Consumer<CurrentLocationProvider>(
+        builder: (context, currentLocationProvider, _) {
+          return SafeArea(
+            child: Column(
+              children: [
+                SettingsHeaderText(context: context, text: "Settings:"),
+                modeToggle(context),
+                SettingsHeaderText(context: context, text: "My Locations:"),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Location(
+                    setLocation: currentLocationProvider.setCurrentLocation,
+                    getLocation: currentLocationProvider.getCurrentLocation,
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Close Settings"),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class SettingsHeaderText extends StatelessWidget {
+  final String text;
+  final BuildContext context;
+
+  const SettingsHeaderText({
+    super.key,
+    required this.context,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.headlineSmall,
+      ),
+    );
+  }
+}
+
+/*
+Widget modeToggle(BuildContext context) {
+  return Consumer<ThemeProvider>(
+    builder: (context, themeProvider, _) {
+      return SizedBox(
+        width: 400,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              themeProvider.isLight() ? "Light Mode" : "Dark Mode",
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
+            Transform.scale(
+              scale: 0.5,
+              child: Switch(
+                value: themeProvider.isLight(),
+                onChanged: (value) => themeProvider.setLight(value),
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+*/
+
+Widget modeToggle(BuildContext context) {
+  final themeProvider = Provider.of<ThemeProvider>(context);
+  return SizedBox(
+    width: 400,
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          themeProvider.isLight() ? "Light Mode" : "Dark Mode",
+          style: Theme.of(context).textTheme.labelLarge,
+        ),
+        Transform.scale(
+          scale: 0.5,
+          child: Switch(
+            value: themeProvider.isLight(),
+            onChanged: (value) => themeProvider.setLight(value),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+*/
 
 /*
 appBar: AppBar(

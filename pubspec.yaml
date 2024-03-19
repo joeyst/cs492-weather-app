@@ -74,6 +74,11 @@ flutter:
     - assets/sql/insert.sql
     - assets/sql/get_all.sql
     - assets/sql/delete.sql
+    - weather_icons/rainy_furby.jpg
+    - weather_icons/summer_furby.jpg
+    - weather_icons/thunder_furby.jpg
+    - weather_icons/windy_furby.jpg
+    - weather_icons/winter_furby.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
