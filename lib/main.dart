@@ -20,25 +20,6 @@ import './components/flipped_text_widget.dart';
 
 const sqlCreateDatabase = 'assets/sql/create.sql';
 
-/*
-Future<bool> isLight() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  return prefs.getBool("light") ?? true;
-}
-
-Future<List<WeatherForecast>> getWeatherForecasts(UserLocation location, bool hourly) async {
-  return [];
-}
-
-Future<UserLocation> getLocation() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  String locationString = prefs.getString("location") ?? "";
-  return UserLocation.fromJsonString(locationString);
-}
-
-Future<LocationDatabase>
-*/
-
 void main() async {
   databaseFactory = databaseFactoryFfi;
   Provider.debugCheckInvalidValueType = null;
