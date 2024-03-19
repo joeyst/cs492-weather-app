@@ -19,45 +19,6 @@ import './models/providers/location_list_provider.dart';
 
 const sqlCreateDatabase = 'assets/sql/create.sql';
 
-class CurrentLocationProvider extends ChangeNotifier {
-  UserLocation? _currentLocation;
-
-  CurrentLocationProvider();
-
-  void setCurrentLocation(UserLocation currentLocation) async {
-    _currentLocation = currentLocation;
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    sharedPreferences.setString("location", _currentLocation?.toJsonString() ?? "");
-    notifyListeners();
-  }
-
-  static Future<CurrentLocationProvider> create() async {
-    CurrentLocationProvider clp = CurrentLocationProvider();
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    String locationString = sharedPreferences.getString("location") ?? "";
-    clp._currentLocation = UserLocation.fromJsonString(locationString);
-    return clp;
-  }
-}
-
-class LocationListProvider extends ChangeNotifier {
-  late List<UserLocation> _locationList;
-  late LocationDatabase db;
-
-  void addLocation(UserLocation userLocation) {
-    _locationList.add(userLocation);
-    db.insertLocation(userLocation);
-    notifyListeners();
-  }
-
-  static Future<LocationListProvider> create() async {
-    LocationListProvider llp = LocationListProvider();
-    llp.db = await LocationDatabase.open();
-    llp._locationList = await llp.db.getLocations();
-    return llp;
-  }
-}
-
 void main() async {
   databaseFactory = databaseFactoryFfi;
   WidgetsFlutterBinding.ensureInitialized();
