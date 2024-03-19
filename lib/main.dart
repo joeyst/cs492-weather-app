@@ -14,6 +14,9 @@ import 'package:provider/provider.dart';
 
 import './models/location_database.dart';
 
+import './models/providers/current_location_provider.dart';
+import './models/providers/location_list_provider.dart';
+
 const sqlCreateDatabase = 'assets/sql/create.sql';
 
 class CurrentLocationProvider extends ChangeNotifier {
@@ -59,7 +62,7 @@ void main() async {
   databaseFactory = databaseFactoryFfi;
   WidgetsFlutterBinding.ensureInitialized();
   LocationListProvider locationListProvider = await LocationListProvider.create();
-
+  CurrentLocationProvider currentLocationProvider = await CurrentLocationProvider.create();
   runApp(MyApp());
 }
 
