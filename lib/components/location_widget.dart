@@ -104,7 +104,7 @@ class _LocationState extends State<Location> {
 
   // When an item from the list is tapped, set the current location to whichever one was tapped
   void tapList(index) {
-    widget.closeEndDrawer!();
+    // widget.closeEndDrawer!();
     widget.setLocation(_locations.elementAt(index));
   }
 

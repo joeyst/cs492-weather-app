@@ -79,6 +79,10 @@ class UserLocation {
     }
   }
 
+  String name() {
+    return "$city, $state, $zip";
+  }
+
   factory UserLocation.bend() {
     return UserLocation(
       latitude: 44.0582,
